@@ -1,0 +1,16 @@
+#!/bin/bash
+export dwenv="dwdev"
+if [[ `which javaa` ]]
+then
+	echo "found java"
+else
+	sudo apt-get update && \
+	sudo apt-get install -y git curl alien && \
+	wget --no-cookies --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com" "http://download.oracle.com/otn-pub/java/jdk/7u25-b15/jdk-7u25-linux-x64.rpm" && \
+	alien -i --scripts ./jdk-7u25-linux-x64.rpm
+fi
+sudo apt-get install -y git && \
+sudo apt-get install -y puppet && \
+((cd puppet-datawinner/ && git pull ) || git clone https://github.com/mangroveorg/puppet-datawinner.git) && \
+sudo sh -c "echo 127.0.1.1 ${dwenv}.`whoami`>>/etc/hosts" && sudo /bin/sh -c "echo ${dwenv}.`whoami`>/etc/hostname" && sudo hostname "${dwenv}.`whoami`" && \
+cd puppet-datawinner && git submodule update --init && sudo puppet apply --modulepath=modules manifests/nodes.pp
